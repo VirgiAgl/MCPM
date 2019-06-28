@@ -1,27 +1,15 @@
 import sys
 sys.path.append("..")
 
-import numpy as np
-import tensorflow as tf
-import sklearn
-import sklearn.metrics.pairwise as sk
-import time
-import scipy 
-from scipy.stats import poisson
-import random
-import math
-import csv
-from multiprocessing import Pool
+#import os
+#os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
-
-import mcpm
-import methods
-from methods import *
-from mcpm.util.util import *
-from mcpm.util.generate_data import *
-from mcpm.util.utilities import *
-from mcpm.util.process_results import *
 import matplotlib.pyplot as plt
+from multiprocessing import Pool
+from methods import *
+from mcpm.util.generate_data import *
+from mcpm.util.process_results import *
+
 np.random.seed(1500)
 
 # This code does the following:
@@ -52,7 +40,7 @@ optim_ind = False
 num_samples_ell = 10
 n_sample_prediction = 100
 n_bins = 100
-epochs=1500
+epochs=1
 var_steps=1 # var set need to be at least one with epochs > 0!!!
 display_step_nelbo = 1
 inputs_dimension = 1
@@ -73,7 +61,7 @@ point_estimate = 'mean'
 prior_mixing_weights = "Normal"
 
 # Specify the type of method to use. Can be "MCPM", "LGCP", "Pooling"
-method = "LGCP"
+method = "MCPM"
 
 # Kernels for latent GPs. This should be RadialBasis, Matern_3_2, Matern_5_2 or Exponential
 #kernel_type = "RadialBasis"
@@ -165,7 +153,7 @@ if method == 'MCPM':
 if method == 'LGCP':
 	print('I am doing LGCP')
 	def Full_LGCP_learning(task):
-	#for task in xrange(n_tasks):
+	#for task in range(n_tasks):
 		return LGCP_learning(xtrain, xtest, ytrain, task_features, kernel_type, point_estimate, ytrain_non_missing_index, sparsity, sparsity_level, inducing_on_inputs, optim_ind, offset_type, trainable_offset, 
 							lengthscale_initial, sigma_initial, white_noise, input_scaling, lengthscale_initial_weights, sigma_initial_weights, 
 							prior_mixing_weights, num_samples_ell, epochs, var_steps, display_step_nelbo, intra_op_parallelism_threads, 
@@ -211,7 +199,7 @@ suffix2 = prior_mixing_weights + "_" + method + "_" + str(missing_exp) + str(num
 np.save(folder + 'random_noise_vector', random_noise_vector)
 # Create a dataset with data and predictions and save it 
 final_dataset = np.zeros((n_folds, N_all, (n_tasks*3 + inputs_dimension)))
-for i in xrange(n_folds):
+for i in range(n_folds):
 		final_dataset[i] = np.concatenate((inputs, outputs, pred_mean[i], pred_var[i]), axis = 1)
 np.save(folder + 'final_dataset_' + suffix, final_dataset)
 

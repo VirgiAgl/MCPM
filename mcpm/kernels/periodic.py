@@ -2,9 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 from mcpm import util
-import kernel
-
-
+from . import kernel
 
 class Periodic(kernel.Kernel):
     """

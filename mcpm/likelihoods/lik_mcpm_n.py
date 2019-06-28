@@ -1,9 +1,10 @@
 import numpy as np
 import tensorflow as tf
+import scipy
 
-import likelihood
+from . import likelihood
+from mcpm.util.util import *
 
-from mcpm.util.util import init_list
 
 # Implementation of a Log Gaussian Cox process network where we assign each weight a normal prior distribution 
 # We have an independent normal distribution on each weight
@@ -73,7 +74,7 @@ class Lik_MCPM_N(likelihood.Likelihood):
 
         weights_vars = tf.transpose(tf.matrix_diag_part(weights_vars))
 
-        for p in xrange(self.num_tasks):
+        for p in range(self.num_tasks):
 
             # Get the values of the weights means and vars for process p (dim 1*Q)
             weights_mean_subset = weights_means[p,:] 

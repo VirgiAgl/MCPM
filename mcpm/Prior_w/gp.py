@@ -1,8 +1,9 @@
 import numpy as np
 import tensorflow as tf
 
-from mcpm import util
-import prior_w
+from mcpm.util.util import *
+from . import prior_w
+
 
 # Class for the GP prior on the weights
 

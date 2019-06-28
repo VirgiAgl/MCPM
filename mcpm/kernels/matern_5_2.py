@@ -1,10 +1,8 @@
 import numpy as np
 import tensorflow as tf
-import math
 
 from mcpm import util
-import kernel
-
+from . import kernel
 
 class Matern_5_2(kernel.Kernel):
     MAX_DIST = 1e8

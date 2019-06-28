@@ -42,7 +42,7 @@ def LGCP_learning(xtrain, xtest, ytrain, task_features, kernel_type, point_estim
 		xtrain = np.concatenate((xtrain[:,0][:,np.newaxis][ytrain_non_missing_index[:,t]], xtrain[:,1][:,np.newaxis][ytrain_non_missing_index[:,t]]), axis = 1)
 	if dim_inputs > 2:
 		result_array = np.ones((N_all - (N_all/16), 1))
-		for i in xrange(dim_inputs):
+		for i in range(dim_inputs):
 			result = xtrain[:,i][:,np.newaxis][ytrain_non_missing_index[:,t]]
 			result_array = np.append(result_array, result, axis=1)
 		xtrain = result_array[:,1:]
@@ -73,24 +73,24 @@ def LGCP_learning(xtrain, xtest, ytrain, task_features, kernel_type, point_estim
 
 	# Define the kernel object as a Radial basis kernel with the initial pars defined
 	if kernel_type == "RadialBasis":
-		kernel = [mcpm.kernels.RadialBasis(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in xrange(num_latent)] 
+		kernel = [mcpm.kernels.RadialBasis(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in range(num_latent)] 
 	if kernel_type == "Matern_5_2":
-		kernel = [mcpm.kernels.Matern_5_2(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in xrange(num_latent)] 
+		kernel = [mcpm.kernels.Matern_5_2(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in range(num_latent)] 
 	if kernel_type == "Matern_3_2":
-		kernel = [mcpm.kernels.Matern_3_2(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in xrange(num_latent)] 
+		kernel = [mcpm.kernels.Matern_3_2(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in range(num_latent)] 
 	if kernel_type == "Exponential":
-		kernel = [mcpm.kernels.Exponential(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in xrange(num_latent)] 
+		kernel = [mcpm.kernels.Exponential(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in range(num_latent)] 
 	if kernel_type == 'Linear':
-		kernel = [mcpm.kernels.Linear(dim_inputs, variance = sigma_initial) for i in xrange(num_latent)] 
+		kernel = [mcpm.kernels.Linear(dim_inputs, variance = sigma_initial) for i in range(num_latent)] 
 	if kernel_type == 'Periodic':
-		kernel = [mcpm.kernels.Periodic(period = 1.0, variance = sigma_initial, lengthscale = lengthscale_initial, white = white_noise) for i in xrange(num_latent)] 
+		kernel = [mcpm.kernels.Periodic(period = 1.0, variance = sigma_initial, lengthscale = lengthscale_initial, white = white_noise) for i in range(num_latent)] 
 
 
 	# Initialise the prior distribution on the weights. The prior mean is set to zero. 
 	# The prior for the weights need to be given in a format PQX1. For the moment we give a var of 1 to all the weights
 	prior_var_w_vector = np.ones(1*len(kernel), dtype=np.float32)
 
-	kernel_weights = [mcpm.kernels.RadialBasis(num_features, lengthscale = lengthscale_initial_weights, std_dev = sigma_initial_weights, white = white_noise) for i in xrange(num_latent)] 
+	kernel_weights = [mcpm.kernels.RadialBasis(num_features, lengthscale = lengthscale_initial_weights, std_dev = sigma_initial_weights, white = white_noise) for i in range(num_latent)] 
 
 
 	# Define the levels of sparsity we want to train the model 
@@ -135,6 +135,7 @@ def LGCP_learning(xtrain, xtest, ytrain, task_features, kernel_type, point_estim
 	# the posterior means and vars for the weights and 
 	# the predicted means and vars for the intensities corresponding to the test set
 	pred_mean, pred_var, latent_means, latent_vars, means_w, covars_weights, offsets = model.predict(xtest)
+
 
 	return (task, fold, pred_mean, pred_var, latent_means, latent_vars, means_w, covars_weights, offsets, nelbo_values, time_iterations)
 

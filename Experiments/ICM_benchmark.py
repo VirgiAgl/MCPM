@@ -13,7 +13,7 @@ n_cores = 1
 n_folds = 1
 covariates = False
 
-maxiter = 1000
+maxiter = 10
 
 
 

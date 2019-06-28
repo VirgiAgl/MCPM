@@ -1,17 +1,12 @@
 from __future__ import print_function
 
-import numpy as np
-import tensorflow as tf
-
-import kernels
-import likelihoods
-import Prior_w
-import util
-from mcpm.util.util import init_list
-import gc
-import sys
 import time
-   
+
+import tensorflow_probability as tfp
+
+from mcpm.util import *
+from . import Prior_w
+
 
 class mcpm(object):
     """
@@ -297,7 +292,9 @@ class mcpm(object):
         #     print(' ')
         #     print("kernel_params_initial" + ' ' + repr(kernel_params_initial), end=" ")
         #     print(' ')
-
+        
+        # Time training step
+        start = time.time()
         # Start training phase over epochs
         while data.epochs_completed < epochs:
             # Notice that wen var steps > 1 this step is repeated for epochs + var steps. 
@@ -308,16 +305,15 @@ class mcpm(object):
                 # and with the y of the batch as second element  (a matrix)
                 batch = data.next_batch(batch_size)
 
-                # Time training step
-                start = time.time()
+
 
                 # Execution of training step which is defined above as minimisation of negative elbo 
                 self.session.run(self.train_step, feed_dict={self.train_inputs: batch[0], 
                                                              self.train_outputs: batch[1], 
                                                              self.num_train: num_train})
                 # Time training step
-                end = time.time()
-                time_elapsed = end - start
+                #end = time.time()
+                #time_elapsed = end - start
                 #print("Execution time per training epoch", time_elapsed)
 
 
@@ -341,7 +337,7 @@ class mcpm(object):
                     entweight_vector.append(entweight)
                     ell_vector.append(ell)
 
-                    time_tensor.append(time_elapsed)
+                    
 
 
                 ### Uncomment this part to ass a convergence criteria check
@@ -356,6 +352,10 @@ class mcpm(object):
                     #     print('Convergence reached at: ', data.epochs_completed)
                     #     data.epochs_completed = epochs
 
+                        # Time training step
+        end = time.time()
+        time_elapsed = end - start
+        time_tensor.append(time_elapsed)
 
         # Once the optimisation is finished, convert objects to be saved in arrays
         nelbo_vector = np.asarray(nelbo_vector)
@@ -424,7 +424,7 @@ class mcpm(object):
         # Optimised offsets 
         offsets = util.init_list(0.0, [num_batches])
 
-        for i in xrange(num_batches):
+        for i in range(num_batches):
             (pred_means[i], pred_vars[i], latent_means[i], latent_vars[i], means_w[i], 
                 covars_weights[i], offsets[i]) = self.session.run(self.predictions, feed_dict={self.test_inputs: test_inputs[i]})
 
@@ -477,7 +477,8 @@ class mcpm(object):
         # NB. We note that we will always operate over the cholesky space internally!!!
 
         # Variational covariances
-        mat = util.vec_to_tri(raw_covars)
+        mat = util.forward_tensor(raw_covars, self.num_inducing)
+
         diag_mat = tf.matrix_diag(tf.matrix_diag_part(mat))
         exp_diag_mat = tf.matrix_diag(tf.exp(tf.matrix_diag_part(mat)))
         covars = mat - diag_mat + exp_diag_mat 
@@ -486,7 +487,7 @@ class mcpm(object):
         means = raw_means
         inducing_inputs = raw_inducing_inputs
  
-        kernel_mat = [self.kernels[i].kernel(inducing_inputs[i, :, :]) for i in xrange(self.num_latent)]  
+        kernel_mat = [self.kernels[i].kernel(inducing_inputs[i, :, :]) for i in range(self.num_latent)]  
         kernel_chol = tf.stack([tf.cholesky(k) for k in kernel_mat], 0)
 
 
@@ -519,7 +520,7 @@ class mcpm(object):
         task_features = raw_task_features
 
         # In the GP case this is defining the PRIOR covariance matrices for the GP on the weights
-        kernel_mat_weights = [self.kernels_weights[i].kernel(task_features[i, :, :]) for i in xrange(self.num_latent)]  
+        kernel_mat_weights = [self.kernels_weights[i].kernel(task_features[i, :, :]) for i in range(self.num_latent)]  
         kernel_chol_weights = tf.stack([tf.cholesky(k) for k in kernel_mat_weights], 0)
 
 
@@ -573,13 +574,13 @@ class mcpm(object):
     def _build_entropy(self, means, covars): 
         # This function is building the entropy for the latent functions Eq()[logq()]
         sum_val = 0.0
-        for i in xrange(self.num_latent):
+        for i in range(self.num_latent):
             # Recostruct the full covars S starting from its cholesky
             full_covar = tf.matmul(covars[i, :, :], tf.transpose(covars[i, :, :]))
             trace = tf.reduce_sum(tf.matrix_diag_part(tf.cholesky_solve(covars[i, :, :],full_covar)))
             # trace = tf.reduce_sum(tf.eye(200))
 
-            sum_val -= (util.CholNormal(means[i,:], covars[i, :, :]).log_prob(means[i,:]) - 0.5 * trace)
+            sum_val -= (CholNormal(means[i,:], covars[i, :, :]).log_prob(means[i,:]) - 0.5 * trace)
         return sum_val
         
 
@@ -591,11 +592,11 @@ class mcpm(object):
     def _build_cross_ent(self, means, covars, kernel_chol):
         # This function is building the cross entropy for the latent functions 
         sum_val = 0.0
-        for i in xrange(self.num_latent):
+        for i in range(self.num_latent):
             full_covar = tf.matmul(covars[i, :, :], tf.transpose(covars[i, :, :]))
 
             trace = tf.reduce_sum(tf.matrix_diag_part(tf.cholesky_solve(kernel_chol[i, :, :],full_covar)))
-            sum_val += (util.CholNormal(means[i, :], kernel_chol[i, :, :]).log_prob(0.0) - 0.5 * trace)
+            sum_val += (CholNormal(means[i, :], kernel_chol[i, :, :]).log_prob(0.0) - 0.5 * trace)
         return sum_val
 
 
@@ -634,7 +635,7 @@ class mcpm(object):
         kern_sums = util.init_list(0.0, [self.num_latent])
         kern_prods_location = util.init_list(0.0, [self.num_latent])
 
-        for i in xrange(self.num_latent):
+        for i in range(self.num_latent):
             # Compute the term kzx and Kzx_location
             ind_train_kern = self.kernels[i].kernel(inducing_inputs[i, :, :], inputs)
             location_inducing_kern = self.kernels[i].kernel(inducing_inputs[i, :, :], self.events_location)
@@ -673,7 +674,7 @@ class mcpm(object):
         sample_means_location = util.init_list(0.0, [self.num_latent])
         sample_vars = util.init_list(0.0, [self.num_latent])
 
-        for i in xrange(self.num_latent):
+        for i in range(self.num_latent):
             # From the cholesky, we get back the full covariance for the inducing processes. This gives S.
             full_covar = tf.matmul(covars[i, :, :], tf.transpose(covars[i, :, :]))
             # quad form is giving the terms in (23), second formula, second term

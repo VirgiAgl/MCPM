@@ -1,9 +1,10 @@
 import numpy as np
 import tensorflow as tf
+import scipy
 
-import likelihood
+from . import likelihood
+from mcpm.util.util import *
 
-from mcpm.util.util import init_list
 
 # Implementation of LGCP 
 

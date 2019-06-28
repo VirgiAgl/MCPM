@@ -1,10 +1,16 @@
-import datasets
-import likelihoods
-import kernels
-import Prior_w
 
+from .datasets import DataSet
 
-from MCPM import mcpm
+from .likelihoods import *
+
+from .kernels import *
+
+from .Prior_w import normal
+
+from . import Prior_w
+
+from .MCPM import mcpm
+
 
 
 

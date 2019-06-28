@@ -45,7 +45,7 @@ def generate_synthetic_data(N_all, n_tasks, num_latent, num_features = 2):
 	sigma2 = 60 * sk.rbf_kernel(inputs, inputs, gamma=20)
 
 	# Sample the true underlying GPs. 
-	for i in xrange(num_latent):
+	for i in range(num_latent):
 		if i == 0:
 			np.random.seed(10)
 			process_values[i] = np.random.multivariate_normal(mean=np.repeat(0,N_all), cov=sigma1)
@@ -55,9 +55,9 @@ def generate_synthetic_data(N_all, n_tasks, num_latent, num_features = 2):
 			process_values[i] = np.reshape(process_values[i], (N_all,1))
 
 	# Generate the intensities as a linear combination of the latent functions with the weights specific to the task + offset specific to the task
-	for i in xrange(n_tasks):
+	for i in range(n_tasks):
 		weighted_sum = 0.0 
-		for j in xrange(num_latent):
+		for j in range(num_latent):
 			process_values_single = np.array(process_values[j])
 			weights_data_task_single = np.array(weights_data_task[i])[:,np.newaxis]
 			weighted_sum += weights_data_task_single[j,:]*process_values_single
@@ -65,15 +65,15 @@ def generate_synthetic_data(N_all, n_tasks, num_latent, num_features = 2):
 
 
 	# Generate the outputs by sampling from a Poisson with the constructed intensities
-	for j in xrange(n_tasks):
-		for i in xrange(N_all): 
+	for j in range(n_tasks):
+		for i in range(N_all): 
 			sample_intensity_single = sample_intensity[j]
 			outputs[i,j] = np.random.poisson(lam = sample_intensity_single[i,0]) 
 
 
 
 	# Define some task_features used when placing a GP prior on the mixing weights
-	for i in xrange(n_tasks):
+	for i in range(n_tasks):
 		output_toconsider = outputs[:,i]
 		maximum = max(output_toconsider)
 		minimum = min(output_toconsider)
@@ -120,7 +120,7 @@ def generate_synthetic_data_noisy(N_all, n_tasks, num_latent, num_features = 2):
 	sigma2 = 60 * sk.rbf_kernel(inputs, inputs, gamma=20)
 
 	# Sample the true underlying GPs. 
-	for i in xrange(num_latent):
+	for i in range(num_latent):
 		if i == 0:
 			np.random.seed(10)
 			process_values[i] = np.random.multivariate_normal(mean=np.repeat(0,N_all), cov=sigma1)
@@ -130,9 +130,9 @@ def generate_synthetic_data_noisy(N_all, n_tasks, num_latent, num_features = 2):
 			process_values[i] = np.reshape(process_values[i], (N_all,1))
 
 	# Generate the intensities as a linear combination of the latent functions with the weights specific to the task + offset specific to the task
-	for i in xrange(n_tasks):
+	for i in range(n_tasks):
 		weighted_sum = 0.0 
-		for j in xrange(num_latent):
+		for j in range(num_latent):
 			process_values_single = np.array(process_values[j])
 			weights_data_task_single = np.array(weights_data_task[i])[:,np.newaxis]
 			weighted_sum += weights_data_task_single[j,:]*process_values_single
@@ -143,8 +143,8 @@ def generate_synthetic_data_noisy(N_all, n_tasks, num_latent, num_features = 2):
 
 
 	# Generate the outputs by sampling from a Poisson with the constructed intensities
-	for j in xrange(n_tasks):
-		for i in xrange(N_all): 
+	for j in range(n_tasks):
+		for i in range(N_all): 
 			sample_intensity_single = sample_intensity[j]
 			random_noise_vector[i,j] = np.random.normal(loc=0.0, scale=2.0, size=1)
 			outputs[i,j] = np.around(np.random.poisson(lam = sample_intensity_single[i,0]))
@@ -156,7 +156,7 @@ def generate_synthetic_data_noisy(N_all, n_tasks, num_latent, num_features = 2):
 
 
 	# Define some task_features used when placing a GP prior on the mixing weights
-	for i in xrange(n_tasks):
+	for i in range(n_tasks):
 		output_toconsider = outputs[:,i]
 		maximum = max(output_toconsider)
 		minimum = min(output_toconsider)
@@ -181,7 +181,7 @@ def generate_events_location(inputs, process_values, offset_data, sample_intensi
 	# plt.show()
 
 
-	for t in xrange(n_tasks):
+	for t in range(n_tasks):
 		## Here we do thinning
 		range_inputs = np.max(inputs) - np.min(inputs)
 		#max_intensity = np.max(intensity)
@@ -268,7 +268,7 @@ def generate_from_piecewise_linear(N_all, n_tasks, num_latent, n_partitions, num
 	intensity_list = [None]*n_partitions
 	ytrain_non_missing_index_list = [None]*n_partitions
 
-	for i in xrange(n_partitions):
+	for i in range(n_partitions):
 		if i == 1:
 			np.random.seed(20)
 
@@ -351,7 +351,7 @@ def generate_from_piecewise_linear(N_all, n_tasks, num_latent, n_partitions, num
 
 		# Generate the outputs by sampling from a Poisson with the constructed intensities
 		outputs = np.zeros((intensity.shape[0],1))
-		for j in xrange(intensity.shape[0]):
+		for j in range(intensity.shape[0]):
 			outputs[j] = np.random.poisson(lam = intensity[j]) 
 
 		ytrain_non_missing_index_list[i] = ~np.isnan(outputs)
@@ -375,7 +375,7 @@ def generate_locations_1d(inputs, outputs):
 	events_location = []
 	diff = (inputs[1] - inputs[0])
 
-	for i in xrange(200):
+	for i in range(200):
 
 		lower_extreme = inputs[i] - diff/2
 		upper_extreme = inputs[i] + diff/2
@@ -398,21 +398,21 @@ def generate_locations_1d(inputs, outputs):
 
 def generate_missing_data_synthetic(outputs, missing_experiment):
 
-	index1 = xrange(10,60)
-	index1_non_missing1 = xrange(0,10)
-	index1_non_missing2 = xrange(60,200)
+	index1 = range(10,60)
+	index1_non_missing1 = range(0,10)
+	index1_non_missing2 = range(60,200)
 
-	index2 = xrange(30,80)
-	index2_non_missing1 = xrange(0,30)
-	index2_non_missing2 = xrange(80,200)
+	index2 = range(30,80)
+	index2_non_missing1 = range(0,30)
+	index2_non_missing2 = range(80,200)
 
-	index3 = xrange(140,190)
-	index3_non_missing1 = xrange(0,140)
-	index3_non_missing2 = xrange(190,200)
+	index3 = range(140,190)
+	index3_non_missing1 = range(0,140)
+	index3_non_missing2 = range(190,200)
 
-	index4 = xrange(50,100)
-	index4_non_missing1 = xrange(0,50)
-	index4_non_missing2 = xrange(100,200)
+	index4 = range(50,100)
+	index4_non_missing1 = range(0,50)
+	index4_non_missing2 = range(100,200)
 
 	if missing_experiment == True:
 		outputs[index1,0] = np.nan
@@ -432,11 +432,11 @@ def generate_missing_data_crime_1D(list_indeces_product, missing_exp, total_list
 
 	outputs_na = np.zeros((N_all, n_tasks))
 	if missing_exp == True:
-		for i in xrange(n_tasks):
+		for i in range(n_tasks):
 			total_outputs[i][(N_all-num_missing_values):] = np.nan
 			outputs_na[:,i] = total_outputs[i].reshape(N_all,)
 	else:
-		for i in xrange(n_tasks):
+		for i in range(n_tasks):
 			outputs_na[:,i] = total_list[:,i + 1]
 	return outputs_na
 
@@ -446,14 +446,14 @@ def generate_missing_data_crime(list_indeces_product, missing_exp, total_list, t
 
 	outputs_na = np.zeros((N_all, n_tasks))
 	if missing_exp == True:
-		for i in xrange(n_tasks):
+		for i in range(n_tasks):
 			if i == 0 or i == 1 or i == 2 or i == 3:
 				total_outputs[i][list_indeces_product[fold + i]] = np.nan
 			if i == 4 or i == 5 or i == 6:
 				total_outputs[i][list_indeces_product[fold + i - 4]] = np.nan
 			outputs_na[:,i] = total_outputs[i].reshape(N_all,)
 	else:
-		for i in xrange(n_tasks):
+		for i in range(n_tasks):
 			outputs_na[:,i] = total_list[:,i + 2]
 	return outputs_na
 

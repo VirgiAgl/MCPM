@@ -25,11 +25,18 @@ def post_process_results_LGCP(multi_processing_results, N_all, n_tasks, num_late
                                                                  n_folds, inputs_dimension, method, prior_mixing_weights)
 
 
-    for i in xrange(len(multi_processing_results)):
+
+
+    print('pred_mean', pred_mean.shape)
+    print('latent_means', latent_means.shape)
+
+    for i in range(len(multi_processing_results)):
         single_result = multi_processing_results[i]
 
         t = single_result[0]
         f = single_result[1]
+        print('single_result[2]', single_result[2].shape)
+        print('single_result[4]', single_result[4].shape)
         pred_mean[f,:,t] = np.sum(single_result[2],axis=1)
         pred_var[f,:,t] = np.sum(single_result[3],axis=1)
 
@@ -63,7 +70,7 @@ def post_process_results_MCPM(multi_processing_results, N_all, n_tasks, num_late
                                                                  display_step_nelbo, num_kernel_hyperpar, n_missing_values, sparsity_level,
                                                                  n_folds, inputs_dimension, method, prior_mixing_weights)
 
-    for i in xrange(len(multi_processing_results)):
+    for i in range(len(multi_processing_results)):
         single_result = multi_processing_results[i]
 
         f = single_result[0]
@@ -109,7 +116,7 @@ def post_process_results_ICM(multi_processing_results, N_all, n_tasks, num_laten
                                                                  n_partition, inputs_dimension, method, prior_mixing_weights)
 
 
-    for i in xrange(len(multi_processing_results)):
+    for i in range(len(multi_processing_results)):
         single_result = multi_processing_results[i]
 
         partition = single_result[0]

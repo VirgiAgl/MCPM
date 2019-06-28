@@ -1,9 +1,8 @@
 import numpy as np
 import tensorflow as tf
-import math
 
 from mcpm import util
-import kernel
+from . import kernel
 
 
 # This function computes the Matern 3/2 kernel 

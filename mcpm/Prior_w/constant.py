@@ -1,5 +1,6 @@
-import prior_w
+from . import prior_w
 import tensorflow as tf
+
 
 # Class for the Normal prior on the weights
 

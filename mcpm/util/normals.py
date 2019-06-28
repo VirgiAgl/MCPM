@@ -1,7 +1,8 @@
 import numpy as np
 import tensorflow as tf
 
-import util
+from . import util
+
 
 class Normal(object):
     def __init__(self, mean, covar):

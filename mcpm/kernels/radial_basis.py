@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 from mcpm import util
-import kernel
+from . import kernel
 
 # This function computes the radial basis kernel 
 
@@ -11,11 +11,11 @@ class RadialBasis(kernel.Kernel):
     
     def __init__(self, input_dim, lengthscale=1.0, std_dev=1.0, white=0.01, input_scaling=False):
         if input_scaling:
-            self.lengthscale = tf.Variable(lengthscale * tf.ones([input_dim]), name = 'lenghtscale')
+            self.lengthscale = tf.Variable(lengthscale * tf.ones([input_dim]), name = 'lenghtscale', trainable= False)
         else:
-            self.lengthscale = tf.Variable([lengthscale], dtype=tf.float32, name = 'lenghtscale')
+            self.lengthscale = tf.Variable([lengthscale], dtype=tf.float32, name = 'lenghtscale', trainable= False)
 
-        self.std_dev = tf.Variable([std_dev], dtype=tf.float32, name = 'std_dev')
+        self.std_dev = tf.Variable([std_dev], dtype=tf.float32, name = 'std_dev', trainable= False)
         self.input_dim = input_dim
         self.white = white
 

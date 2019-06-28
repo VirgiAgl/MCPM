@@ -3,22 +3,68 @@ import copy
 import tensorflow as tf
 import numpy as np
 
+def eye(N):
+    return tf.diag(tf.ones(tf.stack([N, ]), dtype='float32'))
+
+def tri_vec_shape(N):
+    return [int(N * (N + 1) / 2)]
+
+
+def vec_to_lower_triangle_matrix(n,vec):
+    vec = tf.transpose(vec)
+    indices = tf.constant(list(zip(*np.tril_indices(n))))
+    mat = tf.scatter_nd(indices=indices, shape=[n,n], updates=vec)
+    return mat
+
+def tf_vec_to_tri(vectors, N):
+    """
+    Takes a D x M tensor `vectors' and maps it to a D x matrix_size X matrix_sizetensor
+    where the where the lower triangle of each matrix_size x matrix_size matrix is
+    constructed by unpacking each M-vector.
+    Native TensorFlow version of Custom Op by Mark van der Wilk.
+    def int_shape(x):
+        return list(map(int, x.get_shape()))
+    D, M = int_shape(vectors)
+    N = int( np.floor( 0.5 * np.sqrt( M * 8. + 1. ) - 0.5 ) )
+    # Check M is a valid triangle number
+    assert((matrix * (N + 1)) == (2 * M))
+    """
+    indices = list(zip(*np.tril_indices(N)))
+    indices = tf.constant([list(i) for i in indices], dtype=tf.int64)
+
+    def vec_to_tri_vector(vector):
+        return tf.scatter_nd(indices=indices, shape=[N, N], updates=vector)
+
+    return tf.map_fn(vec_to_tri_vector, vectors)
+
+
+def forward_tensor(x, N):
+    """
+    Transforms from the packed to unpacked representations (tf.tensors)
+    
+    :param x: packed tensor. Must have shape `self.num_matrices x triangular_number
+    :return: Reconstructed tensor y of shape self.num_matrices x N x N
+    """
+    fwd = tf_vec_to_tri(x, N)
+    return fwd
+
+
 def init_list(init, dims):
     def empty_list(dims):
         if not dims:
             return None
         else:
-            return [copy.deepcopy(empty_list(dims[1:])) for i in xrange(dims[0])]
+            return [copy.deepcopy(empty_list(dims[1:])) for i in range(dims[0])]
 
     def fill_list(dims, l):
         if len(dims) == 1:
-            for i in xrange(dims[0]):
+            for i in range(dims[0]):
                 if callable(init):
                     l[i] = init()
                 else:
                     l[i] = init
         else:
-            for i in xrange(dims[0]):
+            for i in range(dims[0]):
                 fill_list(dims[1:], l[i])
 
     l = empty_list(dims) 

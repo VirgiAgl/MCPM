@@ -8,6 +8,7 @@ from multiprocessing import Pool
 from initialization_inducing import initialize_inducing_points
 
 
+
 def MCPM_learning(xtrain, xtest, ytrain, task_features, kernel_type, prior_weights, point_estimate, ytrain_non_missing_index, 
 				n_missing_values, sparsity, sparsity_level, inducing_on_inputs, optim_ind, offset_type, offset_initial, n_tasks, num_latent, trainable_offset, lengthscale_initial, 
 				sigma_initial, white_noise, input_scaling, lengthscale_initial_weights, sigma_initial_weights, prior_mixing_weights, num_samples_ell,
@@ -43,24 +44,24 @@ def MCPM_learning(xtrain, xtest, ytrain, task_features, kernel_type, prior_weigh
 
 	# Initiliaze the kernels
 	if kernel_type == "RadialBasis":
-		kernel = [mcpm.kernels.RadialBasis(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in xrange(num_latent)] 
+		kernel = [mcpm.kernels.RadialBasis(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in range(num_latent)] 
 	if kernel_type == "Matern_5_2":
-		kernel = [mcpm.kernels.Matern_5_2(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in xrange(num_latent)] 
+		kernel = [mcpm.kernels.Matern_5_2(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in range(num_latent)] 
 	if kernel_type == "Matern_3_2":
-		kernel = [mcpm.kernels.Matern_3_2(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in xrange(num_latent)] 
+		kernel = [mcpm.kernels.Matern_3_2(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in range(num_latent)] 
 	if kernel_type == "Exponential":
-		kernel = [mcpm.kernels.Exponential(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in xrange(num_latent)] 
+		kernel = [mcpm.kernels.Exponential(dim_inputs, lengthscale = lengthscale_initial, std_dev = sigma_initial, white = white_noise, input_scaling = input_scaling) for i in range(num_latent)] 
 	if kernel_type == 'Linear':
-		kernel = [mcpm.kernels.Linear(dim_inputs, variance = sigma_initial) for i in xrange(num_latent)] 
+		kernel = [mcpm.kernels.Linear(dim_inputs, variance = sigma_initial) for i in range(num_latent)] 
 	if kernel_type == 'Periodic':
-		kernel = [mcpm.kernels.Periodic(period = 1.0, variance = sigma_initial, lengthscale = lengthscale_initial, white = white_noise) for i in xrange(num_latent)] 
+		kernel = [mcpm.kernels.Periodic(period = 1.0, variance = sigma_initial, lengthscale = lengthscale_initial, white = white_noise) for i in range(num_latent)] 
 
 	# Initialise the PRIOR variances for the weights. The prior mean is set to zero. 
 	# The prior for the weights need to be given in a format PQX1. We initialise to 1 the variance for all the weights.
 	prior_var_w_vector = np.ones(n_tasks*len(kernel), dtype=np.float32)
 
 	# Initialise the kernel for the GPs on the weights. Needed is prior = GP.
-	kernel_weights = [mcpm.kernels.RadialBasis(num_features, lengthscale = lengthscale_initial_weights, std_dev = sigma_initial_weights, white = white_noise) for i in xrange(num_latent)] 
+	kernel_weights = [mcpm.kernels.RadialBasis(num_features, lengthscale = lengthscale_initial_weights, std_dev = sigma_initial_weights, white = white_noise) for i in range(num_latent)] 
 
 
 

@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 from mcpm import util
-import kernel
+from . import kernel
 
 class Exponential(kernel.Kernel):
     MAX_DIST = 1e8

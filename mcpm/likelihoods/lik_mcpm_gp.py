@@ -1,9 +1,9 @@
 import numpy as np
 import tensorflow as tf
+import scipy
 
-import likelihood
-
-from mcpm.util.util import init_list
+from . import likelihood
+from mcpm.util.util import *
 
 
 # Implementation of a Log Gaussian Cox process network where we a GP prior to the vector w_q of dimension P. 
@@ -32,7 +32,7 @@ class Lik_MCPM_GP(likelihood.Likelihood):
         
         full_covar = init_list(0.0, [self.num_latent])
 
-        for q in xrange(self.num_latent):
+        for q in range(self.num_latent):
             covar_input = covars_weights[q, :, :]
             full_covar[q] = tf.matmul(covar_input, tf.transpose(covar_input))
         full_covar = tf.stack(full_covar)
@@ -85,15 +85,15 @@ class Lik_MCPM_GP(likelihood.Likelihood):
         
         # For each latent function, recostruct the full covariance matrix of the weights starting from the lower triangular part (QxPxP)
         full_covar = init_list(0.0, [self.num_latent])
-        for i in xrange(self.num_latent):
+        for i in range(self.num_latent):
             covar_input = weights_vars[i, :, :]
             full_covar[i] = tf.matmul(covar_input, tf.transpose(covar_input))
         full_covar = tf.stack(full_covar)
 
         # Extract the diagonal terms (variances) for each weight (QxP)
         weights_variances = init_list(0.0, [self.num_latent, self.num_tasks])
-        for q in xrange(self.num_latent):
-            for p in xrange(self.num_tasks):
+        for q in range(self.num_latent):
+            for p in range(self.num_tasks):
                 weights_variances[q][p] = full_covar[q,p,p]
         weights_variances = tf.stack(weights_variances)
 
@@ -107,7 +107,7 @@ class Lik_MCPM_GP(likelihood.Likelihood):
         pred_means = init_list(0.0, [self.num_tasks])
         pred_means_square = init_list(0.0, [self.num_tasks])
 
-        for p in xrange(self.num_tasks):
+        for p in range(self.num_tasks):
 
             # Get the values of the weights means and vars for process p (dim 1*Q)
             weights_mean_subset = weights_means[p,:] 
