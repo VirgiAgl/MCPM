@@ -500,7 +500,7 @@ class mcpm(object):
         
 
         if type(self.weights) == Prior_w.GP:
-            mat_weights = util.vec_to_tri(raw_covars_weights)
+            mat_weights = util.forward_tensor(raw_covars_weights, self.num_tasks)
             diag_mat_weights = tf.matrix_diag(tf.matrix_diag_part(mat_weights))
             exp_diag_mat_weights = tf.matrix_diag(tf.exp(tf.matrix_diag_part(mat_weights))) * 0.3
             covars_weights = mat_weights - diag_mat_weights + exp_diag_mat_weights

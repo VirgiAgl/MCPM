@@ -58,7 +58,7 @@ point_estimate = 'mean'
 
 # Specify the type of prior to use when training MCPM. Can be "Normal" or "GP"
 # Set to Normal when running LGCP
-prior_mixing_weights = "Normal"
+prior_mixing_weights = "GP"
 
 # Specify the type of method to use. Can be "MCPM", "LGCP", "Pooling"
 method = "MCPM"

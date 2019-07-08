@@ -3,6 +3,8 @@ import tensorflow as tf
 
 from mcpm.util.util import *
 from . import prior_w
+from mcpm.util.util import *
+from mcpm.util.normals import *
 
 
 # Class for the GP prior on the weights
@@ -21,7 +23,7 @@ class GP(prior_w.Prior_w):
 
         full_covar = util.init_list(0.0, [self.num_latent])
 
-        for q in xrange(self.num_latent):
+        for q in range(self.num_latent):
             covar_input = covar[q, :, :]
             full_covar[q] = tf.matmul(covar_input, tf.transpose(covar_input))
         full_covar = tf.stack(full_covar)
@@ -34,24 +36,24 @@ class GP(prior_w.Prior_w):
 
     def entropy(self, means, covar):
         sum_val = 0.0
-        for i in xrange(self.num_latent):
+        for i in range(self.num_latent):
             # Recostruct the full covars_weights S_wp starting from its cholesky
             # check if correct
             full_covar = tf.matmul(covar[i, :, :], tf.transpose(covar[i, :, :]))
             trace = tf.reduce_sum(tf.matrix_diag_part(tf.cholesky_solve(covar[i, :, :],full_covar)))
-            sum_val -= (util.CholNormal(means[i, :], covar[i, :, :]).log_prob(means[i, :]) -
+            sum_val -= (CholNormal(means[i, :], covar[i, :, :]).log_prob(means[i, :]) -
                     0.5 * trace)
             entropy = sum_val
         return entropy 
 
     def cross_entropy(self, means, covar, chol_var_weights, kernel_chol_weights):
         sum_val = 0.0
-        for i in xrange(self.num_latent):
+        for i in range(self.num_latent):
             full_covar = tf.matmul(covar[i, :, :], tf.transpose(covar[i, :, :]))
 
             trace = tf.reduce_sum(tf.matrix_diag_part(tf.cholesky_solve(kernel_chol_weights[i, :, :],full_covar)))
 
-            sum_val += (util.CholNormal(means[i, :], kernel_chol_weights[i, :, :]).log_prob(0.0) -
+            sum_val += (CholNormal(means[i, :], kernel_chol_weights[i, :, :]).log_prob(0.0) -
                     0.5 * trace)
         cross_ent_weights = sum_val
 
